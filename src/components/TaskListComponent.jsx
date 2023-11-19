@@ -1,22 +1,16 @@
-import React, { useEffect, useState, useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  setListData,
-  setFormState,
-  resetFormState,
-  selectFormState,
-  selectListData,
-} from '../redux/Store';
+import React, { useEffect, useState, useCallback, useMemo } from "react";
+import { subscribe, useSnapshot } from "valtio";
 import Addform from "./Addform";
 import TaskCard from "./TaskCard";
+import { state } from "../pages/Homepage";
 
-const TaskListComponent = () => {
-  const dispatch = useDispatch();
-  const listData = useSelector(selectListData);
-  const formState = useSelector(selectFormState);
+const TaskListComponent = ({listData,setListData}) => {
+  const snapshot = useSnapshot(state);
   const [userid, setUserid] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [selectDate, setSelectDate] = useState(new Date());
+
+  
 
   useEffect(() => {
     fetchTodos();
@@ -26,25 +20,25 @@ const TaskListComponent = () => {
     try {
       const storedData = localStorage.getItem("taskData");
       if (storedData) {
-        dispatch(setListData(JSON.parse(storedData)));
+        console.log("storedData", storedData);
+        setListData(JSON.parse(storedData));
       }
       setShowForm(false);
     } catch (error) {
-      console.error("Error fetching data");
+      console.error("NO fetching data");
     }
   };
 
-  const handleAdd = useCallback(() => {
-    dispatch(setFormState({ ...formState, date: Date.now(), id: Date.now() }));
-    dispatch(setListData([...listData, formState]));
-    dispatch(resetFormState());
-    setShowForm(true);
-    fetchTodos();
-  }, [formState, listData]);
 
-  // useEffect(() => {
-  //   setUserid(state.userId);
-  // }, []);
+  const handleAdd = useCallback(() => {
+    state.formToggle = true;
+  }, []);
+
+
+
+  useEffect(() => {
+    setUserid(snapshot.userId);
+  }, [snapshot.userId]);
 
   useEffect(() => {
     const calenderSelectDate = subscribe(state, () => {
@@ -60,10 +54,12 @@ const TaskListComponent = () => {
     return () => toggleEditBtn();
   }, []);
 
+  
+
   return (
     <section className="w-full md:min-w-[calc(100vw-55vw)] pt-5 xl:p-14 text-[#47425b] md:order-2">
       <main className="flex min-w-max px-5 mb-12 relative">
-      <header className="w-full">
+        <header className="w-full">
           <h1 className="text-3xl leading-[60px] tracking-normal md:text-2xl lg:text-4xl">
             Today's schedule
           </h1>
@@ -93,10 +89,9 @@ const TaskListComponent = () => {
           <Addform fetchTodos={() => fetchTodos()} />
         </div>
       </main>
+
       <main className="h-[calc(100vh-24vh)] rounded-xl flex flex-col gap-3 overflow-y-scroll p-5 relative ">
-        {listData.map((task) => (
-          <TaskCard key={task.id} task={task} />
-        ))}
+        {listData.map((task) => <TaskCard task={task} setListData={setListData} />)}
       </main>
     </section>
   );

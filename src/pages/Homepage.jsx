@@ -1,17 +1,27 @@
-// Homepage.js
-import React from 'react';
-import TaskListComponent from '../components/TaskListComponent';
-import ControllerComponent from '../components/ControllerComponent';
+import { proxy } from "valtio";
+
+import TaskListComponent from "../components/TaskListComponent";
+import ControllerComponent from "../components/ControllerComponent";
+import { useState } from "react";
+
+
+export const state = proxy({
+    userId: "",
+    calenderDate: null,
+    formToggle: false,
+    selectedData: null,
+  });
 
 function Homepage() {
-  // Additional logic if needed
 
-  return (
-    <div className="w-screen xl:h-screen md:flex overflow-hidden">
-      <TaskListComponent />
-      <ControllerComponent />
-    </div>
-  );
+    const [listData, setListData] = useState([]);
+
+    return (
+      <div className="w-screen xl:h-screen md:flex overflow-hidden">
+        <TaskListComponent listData={listData} setListData={setListData} />
+        <ControllerComponent setListData={setListData} listData={listData} />
+      </div>
+    );
 }
 
-export default Homepage;
+export default Homepage

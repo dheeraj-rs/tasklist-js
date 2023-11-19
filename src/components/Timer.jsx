@@ -1,34 +1,40 @@
-// Timer.js
-import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { setTimerCount, setTimerPlay } from "../redux/Store";
+import React, { useEffect, useState } from "react";
 
-function Timer({ setListData, listData }) {
-  const dispatch = useDispatch();
-  const timerCount = useSelector((state) => state.timer.timerCount);
-  const timerPlay = useSelector((state) => state.timer.timerPlay);
+import { subscribe } from "valtio";
+import { state } from "../pages/Homepage";
+
+function Timer({setListData,listData}) {
+  const [timerCount, setTimerCount] = useState(0);
+  const [timerPlay, setTimerPlay] = useState(false);
+
 
   useEffect(() => {
-    console.log("state.selectedData", state.selectedData);
-    if (state.selectedData?.totalTimeSpend) {
-      setTimerCount(state.selectedData?.totalTimeSpend);
-    }
-  }, [dispatch]);
+    const toggleEditBtn = subscribe(state, () => {
+        console.log("state.selectedData",state.selectedData)
+        if(state.selectedData?.totalTimeSpend){
+            setTimerCount(state.selectedData?.totalTimeSpend)
+        }
+    });
+    return () => toggleEditBtn();
+  }, []);
+
 
   useEffect(() => {
     let intervalId;
 
     if (timerPlay) {
       intervalId = setInterval(() => {
-        dispatch(setTimerCount(timerCount + 1));
+        setTimerCount((prevCount) => prevCount + 1);
       }, 1000);
     }
 
     return () => clearInterval(intervalId);
-  }, [timerPlay, timerCount, dispatch]);
+  }, [timerPlay]);
+
+  const formatTime = (number) => (number < 10 ? "0" + number : number);
 
   const handlePlay = () => {
-    dispatch(setTimerPlay(!timerPlay));
+    setTimerPlay((prev) => !prev);
   };
 
   const handleSave = () => {
@@ -46,48 +52,46 @@ function Timer({ setListData, listData }) {
 
     localStorage.setItem("taskData", JSON.stringify(editedData));
 
-    setListData(editedData);
+    setListData(editedData)
 
-    state.selectedData = null;
+    state.selectedData = null
 
-    setTimerCount(0);
+    setTimerCount(0)
   };
 
   return (
     <div className="">
-      <div className="">
-        <div className="bg-gray-200 p-8 rounded-2xl border-2 shadow-lg mt-5 relative">
-          <div className="flex justify-between text-4xl">
-            <div>{formatTime(Math.floor(timerCount / 3600))}</div>
-            <div>:</div>
-            <div>{formatTime(Math.floor((timerCount % 3600) / 60))}</div>
-            <div>:</div>
-            <div>{formatTime(timerCount % 60)}</div>
-          </div>
-          <div className="text-center mt-4">
-            <span className="text-gray-500">HH</span>
-            <span className="mx-2">:</span>
-            <span className="text-gray-500">MM</span>
-            <span className="mx-2">:</span>
-            <span className="text-gray-500">SS</span>
-          </div>
+      <div className="bg-gray-200 p-8 rounded-2xl border-2 shadow-lg mt-5 relative">
+        <div className="flex justify-between text-4xl">
+          <div>{formatTime(Math.floor(timerCount / 3600))}</div>
+          <div>:</div>
+          <div>{formatTime(Math.floor((timerCount % 3600) / 60))}</div>
+          <div>:</div>
+          <div>{formatTime(timerCount % 60)}</div>
+        </div>
+        <div className="text-center mt-4">
+          <span className="text-gray-500">HH</span>
+          <span className="mx-2">:</span>
+          <span className="text-gray-500">MM</span>
+          <span className="mx-2">:</span>
+          <span className="text-gray-500">SS</span>
+        </div>
 
-          <div
-            className="absolute right-4 bottom-2 rounded-full"
-            onClick={() => handlePlay()}
-          >
-            {!timerPlay ? "▶️" : "⏸️"}
-          </div>
+        <div
+          className="absolute right-4 bottom-2 rounded-full"
+          onClick={() => handlePlay()}
+        >
+          {!timerPlay ? "▶️" : "⏸️"}
         </div>
-        <div className="w-full p-5 flex justify-center ">
-          <button
-            className="bg-yellow-500 text-white shadow-lg px-3 rounded-lg py-1 "
-            onClick={() => handleSave()}
-          >
-            Save
-          </button>
-        </div>
-      </div>{" "}
+      </div>
+      <div className="w-full p-5 flex justify-center ">
+        <button
+          className="bg-yellow-500 text-white shadow-lg px-3 rounded-lg py-1 "
+          onClick={() => handleSave()}
+        >
+          Save
+        </button>
+      </div>
     </div>
   );
 }

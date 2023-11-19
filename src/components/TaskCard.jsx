@@ -1,31 +1,32 @@
-import React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { setSelectedData, selectSelectedData } from '../redux/Store';
+import React, { useCallback, useState } from "react";
+
+import { state } from "../pages/Homepage";
 
 function TaskCard({ task }) {
-  const dispatch = useDispatch();
-  const selectedData = useSelector(selectSelectedData);
+  const [selected, setSelected] = useState(false);
 
-  const handleEdit = () => {
+  const handleEdit = useCallback((task) => {
     console.log("handleEdit");
-
-    if (selectedData?.id === task?.id) {
-      dispatch(setSelectedData(null));
-    } else {
-      dispatch(setSelectedData(task));
-      console.log("task", task);
+    
+    if(state.selectedData?.id === task?.id){
+        state.selectedData = null
+    }else{
+        setSelected(true);
+        state.selectedData = task;
+        console.log("task", task);
     }
-  };
+   
+  }, []);
 
   return (
     <div
       className={`flex items-center gap-4 relative w-full `}
       key={task._id}
-      onClick={handleEdit}
+      onClick={() => handleEdit(task)} // Show options on double click
     >
       <div
         className={`flex-grow p-3 min-w-0 rounded-lg border overflow-x-scroll ${
-          selectedData?.id === task?.id
+          state.selectedData?.id === task?.id
             ? "border-[#f5bd6c] shadow-lg"
             : "border-[#edeff3]"
         }`}

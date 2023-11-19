@@ -1,37 +1,7 @@
-import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { setListData, selectListData, selectTimerCount } from '../redux/Store';
+import React, { useEffect, useState } from "react";
 import Timer from "./Timer";
 
-const ControllerComponent = () => {
-  const dispatch = useDispatch();
-  const listData = useSelector(selectListData);
-  const timerCount = useSelector(selectTimerCount);
-
-  useEffect(() => {
-    fetchListData();
-    fetchTimerCount();
-  }, []);
-
-  const fetchListData = () => {
-    try {
-      const storedData = localStorage.getItem("taskData");
-      if (storedData) {
-        dispatch(setListData(JSON.parse(storedData)));
-      }
-    } catch (error) {
-      console.error("Error fetching data");
-    }
-  };
-
-  const fetchTimerCount = () => {
-    // Assuming you have a way to fetch the timer count from local storage or another source
-    // and dispatch it to the store using setTimerCount
-    // Example:
-    // const timerCount = getTimerCountFromLocalStorage();
-    // dispatch(setTimerCount(timerCount));
-  };
-
+const ControllerComponent= ({ listData, setListData }) => {
   return (
     <section className="w-full md:min-w-[calc(100vw-70vw)] max-h-full p-5 xl:p-14 bg-[#e7f0fa] text-[#47425b] md:order-1 duration-1000 relative">
       <header className="flex gap-4 items-center 2xl:gap-10">
@@ -42,7 +12,7 @@ const ControllerComponent = () => {
           Time Tracker
         </h1>
       </header>
-      <Timer listData={listData} />
+      <Timer listData={listData} setListData={setListData} />
     </section>
   );
 };
