@@ -1,22 +1,25 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 
-import { subscribe } from "valtio";
-import { state } from "../pages/Homepage";
+import { useDispatch, useSelector } from "react-redux";
+import { resetSelectedData, setListData } from "../redux/slices/taskSlice";
 
-function Timer({setListData,listData}) {
+function Timer() {
   const [timerCount, setTimerCount] = useState(0);
   const [timerPlay, setTimerPlay] = useState(false);
 
+  const selectedTask = useSelector(state=>state?.task?.selectedData)
 
-  useEffect(() => {
-    const toggleEditBtn = subscribe(state, () => {
-        console.log("state.selectedData",state.selectedData)
-        if(state.selectedData?.totalTimeSpend){
-            setTimerCount(state.selectedData?.totalTimeSpend)
-        }
-    });
-    return () => toggleEditBtn();
-  }, []);
+  const taskList = useSelector(state=>state?.task?.listData)
+
+  const dispatch = useDispatch()
+
+  useEffect(()=>{
+    if(selectedTask?.totalTimeSpend){
+      setTimerCount(selectedTask?.totalTimeSpend)
+    }else{
+      setTimerCount(0)
+    }
+  },[selectedTask])
 
 
   useEffect(() => {
@@ -39,24 +42,20 @@ function Timer({setListData,listData}) {
 
   const handleSave = () => {
     setTimerPlay(false);
-    let taskList = JSON.parse(localStorage.getItem("taskData"));
 
     console.log("taskList", taskList);
 
     let editedData = taskList.map((item) =>
-      item.id === state.selectedData?.id
+      item.id === selectedTask?.id
         ? { ...item, totalTimeSpend: timerCount }
         : item
     );
     console.log("editedData", editedData);
 
-    localStorage.setItem("taskData", JSON.stringify(editedData));
-
-    setListData(editedData)
-
-    state.selectedData = null
+    dispatch(setListData(editedData))
 
     setTimerCount(0)
+    dispatch(resetSelectedData())
   };
 
   return (

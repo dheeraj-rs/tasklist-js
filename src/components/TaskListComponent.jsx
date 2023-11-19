@@ -1,60 +1,24 @@
-import React, { useEffect, useState, useCallback, useMemo } from "react";
-import { subscribe, useSnapshot } from "valtio";
+import { useState, useCallback } from "react";
 import Addform from "./Addform";
 import TaskCard from "./TaskCard";
-import { state } from "../pages/Homepage";
+import { useSelector } from "react-redux";
 
-const TaskListComponent = ({listData,setListData}) => {
-  const snapshot = useSnapshot(state);
-  const [userid, setUserid] = useState("");
+const TaskListComponent = () => {
   const [showForm, setShowForm] = useState(false);
-  const [selectDate, setSelectDate] = useState(new Date());
 
-  
+  const listData = useSelector(state=> state?.task?.listData)
 
-  useEffect(() => {
-    fetchTodos();
-  }, []);
+  const today = new Date();
 
-  const fetchTodos = () => {
-    try {
-      const storedData = localStorage.getItem("taskData");
-      if (storedData) {
-        console.log("storedData", storedData);
-        setListData(JSON.parse(storedData));
-      }
-      setShowForm(false);
-    } catch (error) {
-      console.error("NO fetching data");
-    }
-  };
-
+  const formatedDate = today.toLocaleDateString(undefined, {
+    weekday: "long",
+    day: "numeric",
+  });
 
   const handleAdd = useCallback(() => {
-    state.formToggle = true;
+    setShowForm((prev)=>!prev)
   }, []);
 
-
-
-  useEffect(() => {
-    setUserid(snapshot.userId);
-  }, [snapshot.userId]);
-
-  useEffect(() => {
-    const calenderSelectDate = subscribe(state, () => {
-      setSelectDate(state.calenderDate || new Date());
-    });
-    return () => calenderSelectDate();
-  }, []);
-
-  useEffect(() => {
-    const toggleEditBtn = subscribe(state, () => {
-      setShowForm(state.formToggle || false);
-    });
-    return () => toggleEditBtn();
-  }, []);
-
-  
 
   return (
     <section className="w-full md:min-w-[calc(100vw-55vw)] pt-5 xl:p-14 text-[#47425b] md:order-2">
@@ -66,10 +30,7 @@ const TaskListComponent = ({listData,setListData}) => {
           <aside className="flex items-center gap-4  mt-3">
             {/* show selected Date */}
             <h1 className="text-3xl leading-[50px] tracking-wide text-[#f5bd6c] md:text-2xl lg:text-4xl w-52 lg:w-64">
-              {selectDate.toLocaleDateString(undefined, {
-                weekday: "long",
-                day: "numeric",
-              })}
+              {formatedDate}
             </h1>
           </aside>
         </header>
@@ -86,12 +47,14 @@ const TaskListComponent = ({listData,setListData}) => {
               : "hidden right-[-100px] transition-all duration-1000"
           } absolute z-50 top-24 shadow-lg shadow-[#3454742a]`}
         >
-          <Addform fetchTodos={() => fetchTodos()} />
+          <Addform setShowForm={setShowForm} />
         </div>
       </main>
 
       <main className="h-[calc(100vh-24vh)] rounded-xl flex flex-col gap-3 overflow-y-scroll p-5 relative ">
-        {listData.map((task) => <TaskCard task={task} setListData={setListData} />)}
+        {listData?.map((task,index) => (
+          <TaskCard key={index*17} task={task} />
+        ))}
       </main>
     </section>
   );

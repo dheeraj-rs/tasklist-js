@@ -1,32 +1,30 @@
-import React, { useCallback, useState } from "react";
-
-import { state } from "../pages/Homepage";
+import { useCallback } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setSelectedData } from "../redux/slices/taskSlice";
 
 function TaskCard({ task }) {
-  const [selected, setSelected] = useState(false);
 
-  const handleEdit = useCallback((task) => {
-    console.log("handleEdit");
-    
-    if(state.selectedData?.id === task?.id){
-        state.selectedData = null
-    }else{
-        setSelected(true);
-        state.selectedData = task;
-        console.log("task", task);
+  const selectedTask = useSelector((state) => state?.task?.selectedData)
+
+  const dispatch = useDispatch()
+
+  const handleSelect = (task) => {
+    if (selectedTask?.id === task?.id) {
+      dispatch(setSelectedData(null));
+    } else {
+      dispatch(setSelectedData(task));
     }
-   
-  }, []);
+  }
 
   return (
     <div
       className={`flex items-center gap-4 relative w-full `}
       key={task._id}
-      onClick={() => handleEdit(task)} // Show options on double click
+      onClick={() => handleSelect(task)}
     >
       <div
         className={`flex-grow p-3 min-w-0 rounded-lg border overflow-x-scroll ${
-          state.selectedData?.id === task?.id
+          selectedTask?.id === task?.id
             ? "border-[#f5bd6c] shadow-lg"
             : "border-[#edeff3]"
         }`}
@@ -42,21 +40,14 @@ function TaskCard({ task }) {
         </div>
 
         <div className="pl-[60px] text-xs">
-          {task.description?.map(
-            (
-              detail,
-              index
-            ) => (
-              <li
-                className={
-                  detail ? (index < 1 ? "list-none" : "list-disc") : ""
-                }
-                key={index}
-              >
-                {detail || ""}
-              </li>
-            )
-          )}
+          {task.description?.map((detail, index) => (
+            <li
+              className={detail ? (index < 1 ? "list-none" : "list-disc") : ""}
+              key={index}
+            >
+              {detail || ""}
+            </li>
+          ))}
         </div>
       </div>
     </div>

@@ -1,16 +1,8 @@
-import { proxy } from "valtio";
-
 import TaskListComponent from "../components/TaskListComponent";
 import ControllerComponent from "../components/ControllerComponent";
 import { useState } from "react";
 
 
-export const state = proxy({
-    userId: "",
-    calenderDate: null,
-    formToggle: false,
-    selectedData: null,
-  });
 
 function Homepage() {
 

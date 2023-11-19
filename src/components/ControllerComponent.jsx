@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from "react";
 import Timer from "./Timer";
+import { useSelector } from "react-redux";
 
-const ControllerComponent= ({ listData, setListData }) => {
+const ControllerComponent= () => {
+
+  const selectedTask = useSelector(state=>state?.task?.selectedData)
   return (
     <section className="w-full md:min-w-[calc(100vw-70vw)] max-h-full p-5 xl:p-14 bg-[#e7f0fa] text-[#47425b] md:order-1 duration-1000 relative">
       <header className="flex gap-4 items-center 2xl:gap-10">
@@ -12,7 +14,10 @@ const ControllerComponent= ({ listData, setListData }) => {
           Time Tracker
         </h1>
       </header>
-      <Timer listData={listData} setListData={setListData} />
+      {
+        selectedTask ?  <Timer  /> : <p>No task Selected</p>
+      }
+     
     </section>
   );
 };

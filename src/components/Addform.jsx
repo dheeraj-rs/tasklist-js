@@ -1,63 +1,40 @@
-import React, { useEffect, useState } from "react";
-import { proxy, useSnapshot } from "valtio";
-import { state } from "../pages/Homepage";
-
-const currentDate = Date.now();
-
-
+import { useDispatch, useSelector } from "react-redux";
+import { resetFormState, setFormState, updateDescription } from "../redux/slices/formslice";
+import { saveFormData } from "../redux/thunks/formThunks";
 
 const icons = ["🦋", "😍", "😎"];
 
-const Addform = ({ fetchTodos }) => {
-  const snapshot = useSnapshot(state);
-  const [formState, setFormState] = useState({
-    date: "",
-    icon: "",
-    title: "",
-    description: [],
-    totalTimeSpend: 0,
-    id: currentDate,
-  });
+const Addform = ({setShowForm}) => {
+
+  const dispatch = useDispatch();
+
+  const formState = useSelector(state => state.form.formState);
 
   const handleSubmit = () => {
-    setFormState((prevState) => ({
-      ...prevState,
-      date: Date.now(),
-      id: currentDate,
-    }));
+    dispatch(
+      setFormState({
+        id: Date.now(),
+      })
+    );
 
-    const newTask = {
-      ...formState,
-    };
-
-    let taskData = JSON.parse(localStorage.getItem("taskData"));
-
-    console.log("taskData from addform",taskData)
-    if (taskData) {
-      localStorage.setItem("taskData", JSON.stringify([...taskData, newTask]));
-    } else {
-      localStorage.setItem("taskData", JSON.stringify([newTask]));
-    }
-
-    state.formToggle = false;
-    resetFormFields();
-    fetchTodos();
+    dispatch(saveFormData())
   };
 
-  const resetFormFields = () => {
-    setFormState({
-      date: "",
-      time: "",
-      icon: "",
-      description: [],
-      title: "",
-    });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    dispatch(setFormState({ field: name, value }));
   };
+
+
 
   const handleCancel = () => {
-    state.formToggle = false;
-    state.selectedData = null;
-    resetFormFields();
+    setShowForm(false);
+    dispatch(resetFormState())
+  };
+
+  const handleDescriptionChange = (e) => {
+    dispatch(updateDescription(e.target.value));
   };
 
   const buttonClasses =
@@ -74,20 +51,16 @@ const Addform = ({ fetchTodos }) => {
               <td className="relative">
                 <input
                   type="text"
+                  name="title"
                   value={formState.title}
-                  onChange={(e) =>
-                    setFormState((prevState) => ({
-                      ...prevState,
-                      title: e.target.value,
-                    }))
-                  }
+                  onChange={handleChange}
                   className="w-[calc(100%-25%)] px-2 py-1 rounded border border-gray-300"
                   placeholder="Type title..."
                 />
                 <span
                   className={`material-symbols-outlined absolute top-2.5 right-2  text-gray-500 hover:text-gray-700 focus:outline-none cursor-pointer`}
                   onClick={() =>
-                    setFormState((prevState) => ({ ...prevState, title: "" }))
+                    dispatch(setFormState({field: "title" , value: "" }))
                   }
                 >
                   clear_all
@@ -100,12 +73,8 @@ const Addform = ({ fetchTodos }) => {
               <td className="relative">
                 <select
                   value={formState.icon}
-                  onChange={(e) =>
-                    setFormState((prevState) => ({
-                      ...prevState,
-                      icon: e.target.value,
-                    }))
-                  }
+                  name="icon" 
+                  onChange={handleChange}
                   className="w-[calc(100%-25%)] px-2 py-1 rounded border border-gray-300 bg-[#f9fbfd] text-gray-700 shadow-sm focus:outline-none cursor-pointer "
                 >
                   <option value="" disabled>
@@ -124,7 +93,7 @@ const Addform = ({ fetchTodos }) => {
                 <span
                   className={`material-symbols-outlined absolute top-2.5 right-2  text-gray-500 hover:text-gray-700 focus:outline-none cursor-pointer`}
                   onClick={() =>
-                    setFormState((prevState) => ({ ...prevState, icon: "" }))
+                    dispatch(setFormState({field:"icon",value:""}))
                   }
                 >
                   clear_all
@@ -136,24 +105,16 @@ const Addform = ({ fetchTodos }) => {
               <td className="">Description:</td>
               <td className="relative overflow-x-visible">
                 <textarea
-                  value={formState.description.join("\n")}
-                  onChange={(e) =>
-                    setFormState((prevState) => ({
-                      ...prevState,
-                      description: e.target.value.split("\n"),
-                    }))
-                  }
+                  value={formState?.description?.join("\n")}
+                  onChange={handleDescriptionChange}
                   className="w-full px-2  py-1 rounded border border-gray-300 "
                   placeholder="Type description..."
                 ></textarea>
-                {formState.description.length > 0 && (
+                {formState?.description?.length > 0 && (
                   <span
                     className={`material-symbols-outlined absolute bottom-1 right-2  text-gray-500 hover:text-gray-700 focus:outline-none cursor-pointer`}
                     onClick={() =>
-                      setFormState((prevState) => ({
-                        ...prevState,
-                        description: [],
-                      }))
+                      dispatch(setFormState({field:"description" , value:[]}))
                     }
                   >
                     clear_all
