@@ -12,14 +12,11 @@ export const saveFormData = createAsyncThunk(
         const state = getState();
         const { formState } = state.form;
   
-        console.log("Form data from save thunk", formState);
+        // console.log("Form data from save thunk", formState);
         if (!state.form) {
           console.error("Form state not found");
           return;
         }
-  
-        // const { formData } = state.form;
-        // console.log("form data from save thunk", formData);
   
         dispatch(
           setFormState({
@@ -29,7 +26,6 @@ export const saveFormData = createAsyncThunk(
         );
   
         dispatch(addToList(formState));
-        // dispatch(resetFormState());
       } catch (error) {
         console.error("Error in saveFormData thunk:", error);
       }

@@ -10,6 +10,7 @@ const TaskListComponent = () => {
 
   const today = new Date();
 
+
   const formatedDate = today.toLocaleDateString(undefined, {
     weekday: "long",
     day: "numeric",
@@ -53,7 +54,7 @@ const TaskListComponent = () => {
 
       <main className="h-[calc(100vh-24vh)] rounded-xl flex flex-col gap-3 overflow-y-scroll p-5 relative ">
         {listData?.map((task,index) => (
-          <TaskCard key={index*17} task={task} />
+          <TaskCard key={index*17} task={task}  />
         ))}
       </main>
     </section>

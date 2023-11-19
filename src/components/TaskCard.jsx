@@ -37,6 +37,7 @@ function TaskCard({ task }) {
           <h1 className="font-medium w-max md:text-lg ">
             {task.title?.slice(0, 20)}
           </h1>
+         <div className="w-full p-2 flex items-center justify-end ">{task?.currentTime}</div>
         </div>
 
         <div className="pl-[60px] text-xs">

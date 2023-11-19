@@ -2,8 +2,6 @@ import TaskListComponent from "../components/TaskListComponent";
 import ControllerComponent from "../components/ControllerComponent";
 import { useState } from "react";
 
-
-
 function Homepage() {
 
     const [listData, setListData] = useState([]);

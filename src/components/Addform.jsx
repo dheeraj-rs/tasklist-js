@@ -14,6 +14,7 @@ const Addform = ({setShowForm}) => {
     dispatch(
       setFormState({
         id: Date.now(),
+        currentTime:currentTime
       })
     );
 
@@ -39,6 +40,18 @@ const Addform = ({setShowForm}) => {
 
   const buttonClasses =
     "bg-[#f5bd6c] text-white px-4 py-2 mt-4 rounded hover:bg-[#f0a742]";
+
+    const today = new Date();
+
+
+    const options = {
+      hour: 'numeric',
+      minute: 'numeric',
+      second: 'numeric',
+      hour12: false, 
+    };
+    
+    const currentTime = today.toLocaleTimeString(undefined, options);
 
   return (
     <div className="bg-[#f9fbfd] p-5 z-50">
